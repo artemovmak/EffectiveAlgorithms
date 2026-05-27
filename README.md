@@ -2,12 +2,14 @@
 <p align="center"><em>Bounded&nbsp;Integer&nbsp;Weights Shortest&nbsp;Path&nbsp;Problem &middot; C++17</em></p>
 
 <p align="center">
-  <img src="results/report_figs/anim.gif" alt="0-k BFS wavefront animation" width="560"/>
+  <img src="results/report_figs/compare.gif" alt="0-k BFS vs Dijkstra side by side" width="820"/>
 </p>
 
 <p align="center">
-  <em>0&ndash;k BFS wavefront expanding from a centre source on a 120&times;120 grid, k = 4.<br/>
-  Single-thread C++ -- the same code scales to <strong>V = 9&middot;10<sup>8</sup></strong> in 121&nbsp;s.</em>
+  <em>Same 200&times;200 grid, k = 8, single thread.<br/>
+  Both algorithms produce the <strong>same</strong> distance field; Dijkstra
+  spends <strong>3.32&times;</strong> more wall-clock time getting there
+  (13.30&nbsp;ms vs 4.00&nbsp;ms on this input).</em>
 </p>
 
 <p align="center">
@@ -22,16 +24,14 @@ C++17 implementation and benchmarks of the 0&ndash;k BFS family of shortest-path
 algorithms, compared against a Dijkstra baseline. Skoltech Algorithms&nbsp;2026
 course project &mdash; **Artemov Makar, Mark Shkut**.
 
-## Same answer, both algorithms
+## Single-algorithm view
 
-Dijkstra and 0&ndash;k BFS produce identical distance fields on every input
-(byte-identical checksums on every cross-validated graph in the sweep). The
-animation below shows Dijkstra exploring the very same grid -- the wavefront
-looks the same; the difference is what is happening *inside* the data
-structure (priority queue vs. k+1 FIFO buckets).
+The combined view above hides the wavefront detail behind two panels. For a
+closer look at the 0&ndash;k BFS expansion (120&times;120 grid, k = 4, source
+near the centre):
 
 <p align="center">
-  <img src="results/report_figs/anim_dijkstra.gif" alt="Dijkstra wavefront on the same grid" width="560"/>
+  <img src="results/report_figs/anim.gif" alt="0-k BFS wavefront animation" width="520"/>
 </p>
 
 ## Under the hood: the k+1 circular FIFO queues
@@ -97,6 +97,7 @@ viz/
   plot_benchmarks.py  time-vs-V / time-vs-k plots
   report_figs.py      report-quality plots
   animate.py          wavefront GIF from a grid dump
+  animate_compare.py  side-by-side 0-k BFS vs Dijkstra on the same grid
   animate_queues.py   step-by-step queue-mechanic GIF from a trace
 results/
   logs/          raw run logs (sweep.jsonl, scale_*, grid_headline)
@@ -128,10 +129,17 @@ build\zkbfs_dump.exe --graph grid --rows 80 --cols 80 --k 4 --algo bfs0k ^
                      --src 0 --out results\demo.json
 python viz\visualize_dump.py results\demo.json
 
-:: Wavefront animation (the top GIFs)
+:: Wavefront animation (the single-panel GIF)
 build\zkbfs_dump.exe --graph grid --rows 120 --cols 120 --k 4 --algo bfs0k ^
                      --src 7260 --out results\anim_grid.json
 python viz\animate.py results\anim_grid.json --out results\report_figs\anim.gif
+
+:: Side-by-side comparison (the top GIF)
+build\zkbfs_dump.exe --graph grid --rows 200 --cols 200 --k 8 --algo bfs0k    --src 20100 --out results\cmp_bfs0k.json
+build\zkbfs_dump.exe --graph grid --rows 200 --cols 200 --k 8 --algo dijkstra --src 20100 --out results\cmp_dijkstra.json
+python viz\animate_compare.py results\cmp_bfs0k.json results\cmp_dijkstra.json ^
+                              --bfs-time 0.0040 --dijkstra-time 0.0133 ^
+                              --out results\report_figs\compare.gif
 
 :: Multi-queue step-by-step animation
 build\zkbfs_trace.exe --rows 10 --cols 10 --k 3 --src 0 --seed 12 --out results\trace_10x10
