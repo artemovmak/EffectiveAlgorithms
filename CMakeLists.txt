@@ -24,3 +24,7 @@ add_executable(zkbfs_bench
 add_executable(zkbfs_dump
     src/main_dump.cpp
 )
+
+add_executable(zkbfs_trace
+    src/main_trace.cpp
+)

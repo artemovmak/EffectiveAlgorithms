@@ -64,7 +64,12 @@ def main():
     ax.set_xticks([]); ax.set_yticks([])
     ax.scatter([sc], [sr], facecolors="none", edgecolors="white",
                s=90, lw=1.8, zorder=3)
-    suptitle = fig.suptitle(f"0--k BFS wavefront  ·  grid {rows}x{cols}, k={d['k']}",
+    algo_pretty = {
+        "bfs_0k": "0-k BFS",
+        "bfs_01": "0-1 BFS",
+        "dijkstra_pq": "Dijkstra",
+    }.get(d.get("algorithm", ""), d.get("algorithm", "algorithm"))
+    suptitle = fig.suptitle(f"{algo_pretty} wavefront  ·  grid {rows}x{cols}, k={d['k']}",
                             fontsize=12, color="#111", y=0.97)
     subtitle = ax.set_title("", fontsize=10, pad=4, color="#333")
     cb = plt.colorbar(im, ax=ax, shrink=0.85)
