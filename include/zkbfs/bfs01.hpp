@@ -6,8 +6,6 @@
 
 namespace zkbfs {
 
-// 0-1 BFS via std::deque. Weight 0 -> push_front, weight 1 -> push_back.
-// Requires that every edge weight is in {0,1}.
 template <class G>
 RunStats bfs_01(const G& g, Vertex src, std::vector<Distance>& dist) {
     RunStats st;

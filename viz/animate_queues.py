@@ -25,7 +25,6 @@ import matplotlib.patches as mpatches
 from matplotlib.animation import FuncAnimation, PillowWriter
 
 
-# Distinct, readable bucket colours.
 BUCKET_COLORS = ["#4C72B0", "#DD8452", "#55A868", "#C44E52",
                  "#8172B2", "#937860", "#DA8BC3", "#8C8C8C"]
 
@@ -62,16 +61,13 @@ def main():
     dist_final[dist_final < 0] = np.nan
     dmax = float(np.nanmax(dist_final)) if np.any(~np.isnan(dist_final)) else 1.0
 
-    # Simulate state over events. Each frame = one event.
     queues = [deque() for _ in range(M)]
     dist = [None] * V
-    in_queue_bucket = [None] * V    # which bucket holds the latest copy of v
+    in_queue_bucket = [None] * V
     finalized = [False] * V
     cur = 0
     history = []
 
-    # Collapse runs of "advance" events: we update cur but don't render a frame
-    # unless the next event would otherwise be silent.  This keeps the GIF short.
     pending_advance = False
     for ev in events:
         t = ev["type"]
@@ -83,21 +79,18 @@ def main():
         elif t == "advance":
             cur = ev["cur"]
             pending_advance = True
-            continue   # skip rendering
+            continue
         elif t == "pop":
             u = ev["u"]; b = ev["bucket"]; cur = ev["cur"]
-            # the queue should have u at the front
             if queues[b] and queues[b][0] == u:
                 queues[b].popleft()
             else:
-                # robust fallback: remove first occurrence
                 try: queues[b].remove(u)
                 except ValueError: pass
             finalized[u] = True
             in_queue_bucket[u] = None
         elif t == "skip":
             u = ev["u"]
-            # remove the stale entry from whichever bucket it's in
             for b in range(M):
                 if queues[b] and queues[b][0] == u:
                     queues[b].popleft(); break
@@ -107,13 +100,10 @@ def main():
                         queues[b].remove(u); break
         elif t == "relax":
             u = ev["u"]; v = ev["v"]; b = ev["bucket"]; d = ev["new"]
-            # If v was already in a queue, the old entry is left as stale; we
-            # do nothing here -- the algorithm skips it on pop.
             queues[b].append(v)
             dist[v] = d
             in_queue_bucket[v] = b
 
-        # Snapshot a copy of the state for this frame.
         history.append({
             "queues": [list(q) for q in queues],
             "dist":   list(dist),
@@ -126,14 +116,12 @@ def main():
     if args.max_frames and len(history) > args.max_frames:
         history = history[:args.max_frames]
 
-    # ---- Plot layout ----
     fig = plt.figure(figsize=(10.5, 5.4))
     gs = fig.add_gridspec(1, 2, width_ratios=[1.0, 1.05], wspace=0.18)
     ax_grid  = fig.add_subplot(gs[0, 0])
     ax_q     = fig.add_subplot(gs[0, 1])
     fig.patch.set_facecolor("white")
 
-    # Grid axis setup
     ax_grid.set_xlim(-0.5, cols - 0.5)
     ax_grid.set_ylim(rows - 0.5, -0.5)
     ax_grid.set_aspect("equal")
@@ -152,19 +140,16 @@ def main():
             t = ax_grid.text(c, r, "", ha="center", va="center",
                              fontsize=7, color="#ddd")
             cell_texts.append(t)
-    # Highlight source
     sr, sc = src // cols, src % cols
     ax_grid.add_patch(mpatches.Rectangle(
         (sc - 0.5, sr - 0.5), 1, 1, facecolor="none",
         edgecolor="white", linewidth=2.0, zorder=4))
 
-    # Queues axis setup
     ax_q.set_xlim(0, 1.0)
     ax_q.set_ylim(M, 0)
     ax_q.set_xticks([]); ax_q.set_yticks([])
     ax_q.set_title("circular FIFO queues  Q[0..k]  ·  cur points to active",
                    fontsize=10, color="#222", pad=4)
-    # row labels for buckets
     for b in range(M):
         ax_q.text(-0.01, b + 0.5, f"Q[{b}]", ha="right", va="center",
                   fontsize=10, color=BUCKET_COLORS[b % len(BUCKET_COLORS)])
@@ -172,20 +157,16 @@ def main():
             (0, b), 1, 1, facecolor="#f6f6f8", edgecolor="#bbb",
             linewidth=0.6))
 
-    # Pointer arrow for "cur" -- placed to the right of the queues so it does
-    # not overlap with the Q[i] labels on the left.
     arrow = ax_q.annotate(" cur", xy=(1.0, 0.5), xytext=(1.04, 0.5),
                           ha="left", va="center", fontsize=10, color="#c0392b",
                           arrowprops=dict(arrowstyle="->", color="#c0392b", lw=1.4),
                           annotation_clip=False)
 
-    # Status line under both panels
     status = fig.text(0.5, 0.02, "", ha="center", va="bottom",
                       fontsize=10, color="#222")
     fig.suptitle(f"0-k BFS step-by-step  ·  grid {rows}x{cols}, k={k}",
                  fontsize=12, color="#111", y=0.97)
 
-    # Queue-cell layout
     QUEUE_CAPACITY = max(8, max(max(len(q) for q in snap["queues"]) for snap in history))
     cell_w = 1.0 / QUEUE_CAPACITY
     q_rects = [[] for _ in range(M)]
@@ -204,13 +185,11 @@ def main():
 
     def update(i):
         snap = history[i]
-        # Grid: colour by current bucket or finalized.
         for v in range(V):
             patch = cell_patches[v]
             txt = cell_texts[v]
             if snap["final"][v]:
                 d = snap["dist"][v] if snap["dist"][v] is not None else 0
-                # finalize colour: pale-green tint
                 patch.set_facecolor("#cdebc4")
                 patch.set_edgecolor("#7aa466")
                 txt.set_text(f"{d}")
@@ -226,7 +205,6 @@ def main():
                 patch.set_edgecolor("#555")
                 txt.set_text("")
                 txt.set_color("#ccc")
-        # Queues
         cur = snap["cur"]
         active_b = cur % M
         for b in range(M):
@@ -244,10 +222,8 @@ def main():
                 else:
                     rect.set_visible(False)
                     txt.set_text("")
-        # cur pointer
         arrow.xy = (1.0, active_b + 0.5)
         arrow.set_position((1.04, active_b + 0.5))
-        # status
         ev = snap["event"]
         et = ev["type"]
         if et == "pop":

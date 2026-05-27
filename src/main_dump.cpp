@@ -60,7 +60,6 @@ static void run_and_dump(const G& g, const std::string& algo, std::uint32_t k,
     os << "  \"pushes\":" << st.pushes << ",\n";
     os << "  \"pops\":" << st.pops << ",\n";
 
-    // Dump grid-specific metadata so the visualizer can lay it out.
     if constexpr (std::is_same_v<G, GridGraph>) {
         os << "  \"rows\":" << g.rows() << ",\n";
         os << "  \"cols\":" << g.cols() << ",\n";
@@ -73,7 +72,6 @@ static void run_and_dump(const G& g, const std::string& algo, std::uint32_t k,
     }
     os << "],\n";
 
-    // Edge list (only for small CSR graphs; skip on large grids).
     if constexpr (!std::is_same_v<G, GridGraph>) {
         os << "  \"edges\":[";
         bool first = true;

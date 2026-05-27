@@ -14,15 +14,12 @@ from itertools import product
 
 
 def cfg_grid():
-    # (graph, params dict, algos, ks, sizes)
     configs = []
 
-    # ---- Grid: scales to V=10^9 (implicit graph, only distance array in memory)
     grid_sizes = [
-        (1000, 1000),     # 1e6
-        (3162, 3162),     # 1e7
-        (10000, 10000),   # 1e8  -- needs ~0.4 GB for distances
-        # (31623, 31623), # 1e9  -- ~4 GB, enable on big machines
+        (1000, 1000),
+        (3162, 3162),
+        (10000, 10000),
     ]
     for rows, cols in grid_sizes:
         for k in [1, 4, 16]:
@@ -31,7 +28,6 @@ def cfg_grid():
                                 {"rows": rows, "cols": cols, "k": k},
                                 algo))
 
-    # ---- Erdos-Renyi
     er_sizes = [
         (100_000, 0.0002),
         (1_000_000, 0.00002),
@@ -44,7 +40,6 @@ def cfg_grid():
                                 {"n": n, "p": p, "k": k},
                                 algo))
 
-    # ---- Layered DAG
     for L, W in [(100, 1000), (1000, 1000), (1000, 10000)]:
         for k in [1, 4, 16]:
             for algo in ["dijkstra", "bfs0k"] + (["bfs01"] if k == 1 else []):
@@ -52,7 +47,6 @@ def cfg_grid():
                                 {"layers": L, "width": W, "fanout": 4, "k": k},
                                 algo))
 
-    # ---- Chain with chords (adversarial)
     for n in [100_000, 1_000_000]:
         for k in [1, 4]:
             for algo in ["dijkstra", "bfs0k"] + (["bfs01"] if k == 1 else []):

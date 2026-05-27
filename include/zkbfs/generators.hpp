@@ -7,13 +7,11 @@
 
 namespace zkbfs::gen {
 
-// Erdos-Renyi G(n, p) with integer weights uniform in [0,k]. Undirected.
 inline GraphCSR erdos_renyi(std::uint32_t n, double p, std::uint32_t k, std::uint64_t seed) {
     std::mt19937_64 rng(seed);
     std::uniform_real_distribution<double> ur(0.0, 1.0);
     std::uniform_int_distribution<int>     uk(0, static_cast<int>(k));
     std::vector<std::tuple<Vertex,Vertex,Weight>> edges;
-    // Geometric skipping for sparse p.
     if (p <= 0.0 || p > 1.0) p = std::min(std::max(p, 0.0), 1.0);
     double logq = std::log(1.0 - p + 1e-300);
     std::int64_t v = 1, w = -1;
@@ -28,11 +26,10 @@ inline GraphCSR erdos_renyi(std::uint32_t n, double p, std::uint32_t k, std::uin
         }
     }
     GraphCSR g;
-    g.build_from_edges(n, edges, /*symmetrize=*/true);
+    g.build_from_edges(n, edges, true);
     return g;
 }
 
-// Layered DAG: L layers of W vertices, every vertex has 'fanout' random forward edges.
 inline GraphCSR layered_dag(std::uint32_t L, std::uint32_t W, std::uint32_t fanout,
                             std::uint32_t k, std::uint64_t seed) {
     std::mt19937_64 rng(seed);
@@ -51,12 +48,10 @@ inline GraphCSR layered_dag(std::uint32_t L, std::uint32_t W, std::uint32_t fano
         }
     }
     GraphCSR g;
-    g.build_from_edges(V, edges, /*symmetrize=*/false);
+    g.build_from_edges(V, edges, false);
     return g;
 }
 
-// Adversarial chain: 0 -> 1 -> ... -> n-1 with weight pattern that triggers many
-// relaxations in naive BFS variants.  Plus k random shortcut chords.
 inline GraphCSR chain_with_chords(std::uint32_t n, std::uint32_t chords,
                                   std::uint32_t k, std::uint64_t seed) {
     std::mt19937_64 rng(seed);
@@ -72,7 +67,7 @@ inline GraphCSR chain_with_chords(std::uint32_t n, std::uint32_t chords,
             edges.emplace_back(a, b, static_cast<Weight>(uk(rng)));
     }
     GraphCSR g;
-    g.build_from_edges(n, edges, /*symmetrize=*/true);
+    g.build_from_edges(n, edges, true);
     return g;
 }
 

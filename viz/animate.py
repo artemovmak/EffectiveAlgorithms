@@ -46,8 +46,6 @@ def main():
     if dmax <= 0:
         dmax = 1.0
 
-    # Frame thresholds: 0 .. dmax in N steps (slightly past so the final
-    # frame holds the complete picture).
     thresholds = np.linspace(0, dmax * 1.05, args.frames)
 
     fig, ax = plt.subplots(figsize=(6.4, 5.6))
@@ -55,7 +53,6 @@ def main():
     cmap = plt.get_cmap("viridis").copy()
     cmap.set_bad(color="#202028")
 
-    # Initial frame: only the source visible.
     frame_arr = np.full((rows, cols), np.nan, dtype=np.float64)
     sr, sc = src // cols, src % cols
     frame_arr[sr, sc] = 0.0

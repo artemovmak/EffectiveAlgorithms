@@ -6,12 +6,6 @@
 
 namespace zkbfs {
 
-// 0-k BFS using k+1 circular FIFO queues, indexed by dist[v] mod (k+1).
-// At any moment at most k+1 queues are non-empty because a relaxation can move
-// a vertex by at most k steps forward in the distance order.
-//
-// std::queue (deque-backed) outperforms a hand-rolled std::vector ring in
-// our measurements -- it grows in fixed-size chunks rather than doubling.
 template <class G>
 RunStats bfs_0k(const G& g, Vertex src, std::uint32_t k, std::vector<Distance>& dist) {
     RunStats st;

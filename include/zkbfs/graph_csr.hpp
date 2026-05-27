@@ -7,8 +7,6 @@
 
 namespace zkbfs {
 
-// Compressed sparse row graph. Vertex count fits in uint32_t, edge count in uint64_t.
-// Memory: 8*(V+1) + 8*E bytes (offset + (to,w) packed into uint64_t when w<=k<2^32).
 class GraphCSR {
 public:
     GraphCSR() = default;
@@ -49,7 +47,6 @@ public:
     const Vertex*        head_ptr()   const { return head_.data(); }
     const Weight*        weight_ptr() const { return weight_.data(); }
 
-    // Range of outgoing edges of u: [offset[u], offset[u+1]).
     std::uint64_t deg_begin(Vertex u) const { return offset_[u]; }
     std::uint64_t deg_end  (Vertex u) const { return offset_[u + 1]; }
 

@@ -8,9 +8,6 @@
 
 namespace zkbfs {
 
-// Implicit 4-connected grid graph. No edge storage -> V can reach 10^9.
-// Edge weights are derived from a per-vertex "terrain" value (uint8_t).
-// w(u,v) = (terrain[u] + terrain[v]) % (k+1)  -- bounded, integer in [0,k].
 class GridGraph {
 public:
     GridGraph(std::uint32_t rows, std::uint32_t cols, std::uint32_t k, std::uint64_t seed)
@@ -26,7 +23,6 @@ public:
 
     std::uint64_t V() const { return static_cast<std::uint64_t>(rows_) * cols_; }
     std::uint64_t E() const {
-        // 2*(rows*(cols-1) + (rows-1)*cols) undirected -> 4*rows*cols approx
         std::uint64_t e = 0;
         if (cols_ > 1) e += 2ull * rows_ * (cols_ - 1);
         if (rows_ > 1) e += 2ull * (rows_ - 1) * cols_;
@@ -40,7 +36,6 @@ public:
         return static_cast<Vertex>(r) * cols_ + c;
     }
 
-    // Visitor over outgoing neighbours.  fn(neighbour, weight)
     template <class F>
     inline void for_each_neighbour(Vertex u, F&& fn) const {
         std::uint32_t r = u / cols_;

@@ -12,8 +12,6 @@ using Vertex   = std::uint32_t;
 using Index    = std::uint64_t;
 using Weight   = std::uint32_t;
 
-// 32-bit distance is safe whenever k * V < 2^32. The benchmark CLI checks this.
-// Define ZKBFS_DIST64 to fall back to 64-bit (needed when k*V can overflow).
 #ifdef ZKBFS_DIST64
 using Distance = std::uint64_t;
 #else

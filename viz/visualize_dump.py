@@ -39,9 +39,7 @@ def plot_general(d, ax):
     dist = np.array(d["dist"], dtype=np.float64)
     dist[dist < 0] = np.nan
 
-    # Layout: if 'layered' use layered grid layout, else circular.
     if d["graph"] == "layered":
-        # Heuristic: width = sqrt(V), layers = V/width
         L = int(math.sqrt(V))
         W = max(1, V // L)
         xs = np.array([i % W for i in range(V)], dtype=np.float64)
@@ -50,7 +48,6 @@ def plot_general(d, ax):
         theta = np.linspace(0, 2 * np.pi, V, endpoint=False)
         xs = np.cos(theta); ys = np.sin(theta)
 
-    # Edges (skip drawing very dense graphs)
     if len(edges) <= 4000:
         for (u, v, w) in edges:
             ax.plot([xs[u], xs[v]], [ys[u], ys[v]],

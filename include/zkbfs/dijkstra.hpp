@@ -6,10 +6,6 @@
 
 namespace zkbfs {
 
-// Baseline: Dijkstra with std::priority_queue. Lazy-decrease-key (push duplicates).
-// G must provide:
-//   uint64_t V()
-//   for_each_neighbour(Vertex u, F fn)  ->  fn(Vertex v, Weight w)
 template <class G>
 RunStats dijkstra_pq(const G& g, Vertex src, std::vector<Distance>& dist) {
     RunStats st;

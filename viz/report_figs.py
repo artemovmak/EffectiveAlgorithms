@@ -52,16 +52,12 @@ def collect(args):
 
 
 def plot_grid_scaling(rows, outdir):
-    # grid + dijkstra & bfs_0k for k=4 (the headline series) and bfs_01 for k=1
     series = defaultdict(list)
     for r in rows:
         if r["graph"] != "grid":
             continue
         algo = r["algorithm"]
         if algo == "dijkstra_pq":
-            # Dijkstra carries k=0 in its JSON; the run's true k is recoverable
-            # only by joining on relaxations/source -- but for grids we ran
-            # k=1 and k=4 separately. Tag by E since E is fixed per V.
             series[("Dijkstra", "any-k")].append((r["V"], r["seconds"]))
         elif algo == "bfs_0k":
             tag = f"0-k BFS (k={r['k']})"
@@ -90,21 +86,16 @@ def plot_grid_scaling(rows, outdir):
 
 
 def plot_speedup_vs_V(rows, outdir):
-    # For each V, compute speedup = dijkstra/bfs at the same V (k matched).
-    by_V_k = defaultdict(dict)  # (V, k) -> {algo: seconds}
+    by_V_k = defaultdict(dict)
     for r in rows:
         if r["graph"] != "grid":
             continue
         if r["algorithm"] == "dijkstra_pq":
-            # We don't know dijkstra's true k -- but its time depends weakly on
-            # k for grids (same structural V/E). We approximate by using
-            # the smallest dijkstra time at that V as 'k=any'.
             d_k = 0
         else:
             d_k = r["k"]
         by_V_k[(r["V"], r["algorithm"], d_k)].setdefault("seconds", []).append(r["seconds"])
 
-    # Group dijkstra (representative) per V.
     dijk_t = {}
     for (V, algo, k), d in by_V_k.items():
         if algo == "dijkstra_pq":
