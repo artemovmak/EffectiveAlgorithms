@@ -1,12 +1,45 @@
-# 0–k BFS: Bounded Integer Weights Shortest Path Problem
+<h1 align="center">0&ndash;k BFS</h1>
+<p align="center"><em>Bounded&nbsp;Integer&nbsp;Weights Shortest&nbsp;Path&nbsp;Problem &middot; C++17</em></p>
 
-C++17 implementation and benchmarks of the 0–k BFS family of shortest-path
-algorithms, compared against a Dijkstra baseline. Skoltech Algorithms 2026
-course project — Artemov Makar, Mark Shkut.
+<p align="center">
+  <img src="results/report_figs/anim.gif" alt="0-k BFS wavefront animation" width="560"/>
+</p>
 
-Headline result: on a 30 000 × 30 000 implicit grid (V = 9·10⁸, E = 3.6·10⁹),
-single-threaded 0-1 BFS finishes in **121 s** vs Dijkstra's 620 s — a 5.12×
-speed-up with byte-identical checksums.
+<p align="center">
+  <em>0&ndash;k BFS wavefront expanding from a centre source on a 120&times;120 grid, k = 4.<br/>
+  Single-thread C++ -- the same code scales to <strong>V = 9&middot;10<sup>8</sup></strong> in 121&nbsp;s.</em>
+</p>
+
+<p align="center">
+  <img alt="lang" src="https://img.shields.io/badge/lang-C%2B%2B17-blue"/>
+  <img alt="build" src="https://img.shields.io/badge/build-CMake%20%7C%20Make%20%7C%20g%2B%2B-success"/>
+  <img alt="status" src="https://img.shields.io/badge/stage-1%20complete-brightgreen"/>
+</p>
+
+---
+
+C++17 implementation and benchmarks of the 0&ndash;k BFS family of shortest-path
+algorithms, compared against a Dijkstra baseline. Skoltech Algorithms&nbsp;2026
+course project &mdash; **Artemov Makar, Mark Shkut**.
+
+## Headline result
+
+On a 30&thinsp;000 &times; 30&thinsp;000 implicit grid
+(V = 9&middot;10<sup>8</sup>, E = 3.6&middot;10<sup>9</sup>),
+single-threaded 0&ndash;1 BFS finishes in **121&nbsp;s** vs Dijkstra's
+**620&nbsp;s** &mdash; a **5.12&times;** speed-up with byte-identical
+distance checksums.
+
+| V                 | k | Dijkstra | 0&ndash;k BFS | 0&ndash;1 BFS | speed-up |
+|------------------:|--:|---------:|--------------:|--------------:|---------:|
+| 10<sup>6</sup>    | 1 | 0.180 s  | 0.039 s       | 0.070 s       | 4.6&times; |
+| 10<sup>7</sup>    | 1 | 1.98 s   | 0.493 s       | 0.355 s       | 5.6&times; |
+| 10<sup>8</sup>    | 1 | 60.3 s   | 28.4 s        | **5.44 s**    | **11.1&times;** |
+| 4.84&middot;10<sup>8</sup> | 4 | 432.9 s | 451.4 s | &mdash; | 0.96&times; (mem-bound) |
+| **9&middot;10<sup>8</sup>** | 1 | **619.9 s** | &mdash; | **121.2 s** | **5.12&times;** |
+
+See [`stage1_report.pdf`](stage1_report.pdf) for the full writeup with
+figures.
 
 ## Layout
 
@@ -28,9 +61,10 @@ viz/
   visualize_dump.py  grid heatmap / node-link diagram
   plot_benchmarks.py time-vs-V / time-vs-k plots
   report_figs.py     report-quality plots
+  animate.py         wavefront GIF from a grid dump
 results/
   logs/         raw run logs (sweep.jsonl, scale_*, grid_headline)
-  report_figs/  PNG figures used in the report
+  report_figs/  PNG figures + the README animation
 stage1_report.pdf   compiled Stage 1 report
 project_plan.pdf    project plan
 ```
@@ -43,7 +77,7 @@ g++ -std=c++17 -O3 -march=native -Iinclude src\main_bench.cpp -o build\zkbfs_ben
 g++ -std=c++17 -O3 -march=native -Iinclude src\main_dump.cpp  -o build\zkbfs_dump.exe
 ```
 
-Or via Make: `make`. Or via CMake: `cmake -S . -B build && cmake --build build`.
+Or `make`. Or `cmake -S . -B build && cmake --build build`.
 
 ## Run
 
@@ -52,13 +86,28 @@ Or via Make: `make`. Or via CMake: `cmake -S . -B build && cmake --build build`.
 python viz\run_pipeline.py    --bench build\zkbfs_bench.exe --out results\sweep.jsonl --quick
 python viz\plot_benchmarks.py results\sweep.jsonl --outdir results\figs
 
-:: Visualization example
+:: Static visualization
 build\zkbfs_dump.exe --graph grid --rows 80 --cols 80 --k 4 --algo bfs0k ^
                      --src 0 --out results\demo.json
 python viz\visualize_dump.py results\demo.json
+
+:: Animation (the GIF at the top of this README)
+build\zkbfs_dump.exe --graph grid --rows 120 --cols 120 --k 4 --algo bfs0k ^
+                     --src 7260 --out results\anim_grid.json
+python viz\animate.py results\anim_grid.json --out results\report_figs\anim.gif
 
 :: Billion-vertex headline
 build\zkbfs_bench.exe --graph grid --rows 30000 --cols 30000 --k 1 --algo bfs01
 ```
 
-See `stage1_report.pdf` for the full Stage 1 writeup with figures.
+## Algorithms
+
+|                    | data structure                | complexity            |
+|--------------------|-------------------------------|-----------------------|
+| `dijkstra_pq`      | `std::priority_queue` (lazy)  | O((V+E) log V)        |
+| `bfs_01`           | `std::deque`                  | O(V + E)              |
+| `bfs_0k`           | k+1 circular FIFO queues      | O(kV + E), mem O(k+E) |
+
+All three are templated over a graph adapter, so the same code runs on the
+`GridGraph` (implicit, scales to V&nbsp;&approx;&nbsp;10<sup>9</sup>) and on
+the `GraphCSR` (classical edge-list, scales to V&nbsp;&approx;&nbsp;10<sup>8</sup>).
