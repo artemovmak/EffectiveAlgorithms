@@ -1,0 +1,25 @@
+<table style="border-collapse:collapse;margin:0.6em auto;font-size:0.85em;font-variant-numeric:tabular-nums;">
+  <thead>
+    <tr style="border-top:2px solid #222;border-bottom:1px solid #888;">
+      <th style="padding:0.35em 1em;text-align:right;">V</th>
+      <th style="padding:0.35em 1em;text-align:right;">k</th>
+      <th style="padding:0.35em 1em;text-align:right;">Dijkstra</th>
+      <th style="padding:0.35em 1em;text-align:right;">0&ndash;k&nbsp;BFS</th>
+      <th style="padding:0.35em 1em;text-align:right;">0&ndash;1&nbsp;BFS</th>
+      <th style="padding:0.35em 1em;text-align:right;">best speed-up</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>6</sup></td><td style="text-align:right;padding:0.25em 1em;">1</td><td style="text-align:right;padding:0.25em 1em;">0.180&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.039&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.070&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">4.6&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>6</sup></td><td style="text-align:right;padding:0.25em 1em;">4</td><td style="text-align:right;padding:0.25em 1em;">0.222&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.054&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;color:#888;">&mdash;</td><td style="text-align:right;padding:0.25em 1em;">4.1&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>7</sup></td><td style="text-align:right;padding:0.25em 1em;">1</td><td style="text-align:right;padding:0.25em 1em;">1.98&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.493&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.355&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">5.6&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>7</sup></td><td style="text-align:right;padding:0.25em 1em;">4</td><td style="text-align:right;padding:0.25em 1em;">2.61&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">0.623&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;color:#888;">&mdash;</td><td style="text-align:right;padding:0.25em 1em;">4.2&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>8</sup></td><td style="text-align:right;padding:0.25em 1em;">1</td><td style="text-align:right;padding:0.25em 1em;">60.3&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">28.4&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">5.44&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;font-weight:bold;color:#1a6f3d;">11.1&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">10<sup>8</sup></td><td style="text-align:right;padding:0.25em 1em;">4</td><td style="text-align:right;padding:0.25em 1em;">84.9&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">48.8&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;color:#888;">&mdash;</td><td style="text-align:right;padding:0.25em 1em;">1.7&times;</td></tr>
+    <tr><td style="text-align:right;padding:0.25em 1em;">4.84&middot;10<sup>8</sup></td><td style="text-align:right;padding:0.25em 1em;">4</td><td style="text-align:right;padding:0.25em 1em;">432.9&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;">451.4&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;color:#888;">&mdash;</td><td style="text-align:right;padding:0.25em 1em;color:#a05a00;">0.96&times; (mem-bound)</td></tr>
+    <tr style="border-top:1px solid #ccc;"><td style="text-align:right;padding:0.25em 1em;font-weight:bold;">9&middot;10<sup>8</sup></td><td style="text-align:right;padding:0.25em 1em;">1</td><td style="text-align:right;padding:0.25em 1em;font-weight:bold;">619.9&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;color:#888;">&mdash;</td><td style="text-align:right;padding:0.25em 1em;font-weight:bold;">121.2&nbsp;s</td><td style="text-align:right;padding:0.25em 1em;font-weight:bold;color:#1a6f3d;">5.12&times;</td></tr>
+  </tbody>
+  <tfoot>
+    <tr style="border-top:2px solid #222;"><td colspan="6" style="padding-top:0.5em;font-size:0.92em;text-align:center;color:#444;">Every distance array was cross-validated against Dijkstra &mdash; zero mismatches.</td></tr>
+  </tfoot>
+</table>
